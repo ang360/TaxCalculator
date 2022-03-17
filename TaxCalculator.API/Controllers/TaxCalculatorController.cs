@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TaxCalculator.Models.Models;
@@ -38,9 +40,14 @@ namespace TaxCalculator.API.Controllers
 
         [Route("GetTaxesForOrder")]
         [HttpPost]
-        public void GetTaxesForOrder(Order order)
+        public IActionResult GetTaxesForOrder()
         {
-            //return Ok(this._taxCalculator.GetTaxesForOrder(order));
+            using (var reader = new StreamReader(Request.Body))
+            {
+                var body = reader.ReadToEnd();
+                Order order = JsonConvert.DeserializeObject<Order>(body);
+                return Ok(this._taxCalculator.GetTaxesForOrder(order));
+            }
         }
     }
 }

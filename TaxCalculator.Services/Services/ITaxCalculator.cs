@@ -10,6 +10,6 @@ namespace TaxCalculator.Services.Services
     public interface ITaxCalculator
     {
         public Task<decimal> GetTaxRatesForLocation(Location location);
-        public void GetTaxesForOrder(Order order);
+        public decimal GetTaxesForOrder(Order order);
     }
 }

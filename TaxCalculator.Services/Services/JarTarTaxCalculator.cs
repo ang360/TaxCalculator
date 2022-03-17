@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using TaxCalculator.Models.Models;
 using System.Text.Json;
 using Newtonsoft.Json;
+using System.Net;
+using System.IO;
 
 namespace TaxCalculator.Services.Services
 {
@@ -15,7 +17,7 @@ namespace TaxCalculator.Services.Services
         private string token = "Token token=\"5da2f821eee4035db4771edab942a4cc\"";
         private string taxJarURL = "https://api.taxjar.com/v2/";
         private string rateControllerURL = "rates/";
-        private string taxControllerURL = "tax/";
+        private string taxControllerURL = "taxes/";
         public JarTarCalculator(IHttpClientFactory clientFactory)
         {
             this._clientFactory = clientFactory;
@@ -46,8 +48,28 @@ namespace TaxCalculator.Services.Services
             return responseData.Rate.CombinedRate + responseData.Rate.StandardRate;
         }
 
-        public void GetTaxesForOrder(Order order)
+        public decimal GetTaxesForOrder(Order order)
         {
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(this.taxJarURL + this.taxControllerURL);
+            httpWebRequest.ContentType = "application/json";
+            httpWebRequest.Method = "POST";
+            httpWebRequest.Headers.Add("Authorization", "Token token=" + this.token);
+
+            using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+            {
+                string json = JsonConvert.SerializeObject(order, Formatting.Indented);
+
+                streamWriter.Write(json);
+            }
+
+            var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                var result = streamReader.ReadToEnd();
+                var responseData = JsonConvert.DeserializeObject<JarTarTax>(result);
+                var test = responseData.Tax.AmountToCollect;
+                return test;
+            }
         }
     }
 }
