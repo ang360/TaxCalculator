@@ -1,14 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using TaxCalculator.Models.Models;
 using TaxCalculator.Services.Services;
+using static TaxCalculator.API.Startup;
 
 namespace TaxCalculator.API.Controllers
 {
@@ -17,11 +14,13 @@ namespace TaxCalculator.API.Controllers
     public class TaxCalculatorController : ControllerBase
     {
         private ITaxCalculator _taxCalculator;
-        public TaxCalculatorController(ITaxCalculator taxCalculator)
-        {
-            this._taxCalculator = taxCalculator;
-        }
+        private readonly IConfiguration _config;
 
+        public TaxCalculatorController(ServiceResolver _taxCalculator, IConfiguration config)
+        {
+            _config = config;
+            this._taxCalculator = _taxCalculator(_config.GetValue<string>("AppIdentitySettings:Client"));
+        }
 
         [Route("GetTaxRatesForLocation/{ZipCode}")]
         [HttpGet]

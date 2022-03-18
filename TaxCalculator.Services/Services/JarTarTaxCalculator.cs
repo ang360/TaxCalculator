@@ -8,18 +8,21 @@ using System.Text.Json;
 using Newtonsoft.Json;
 using System.Net;
 using System.IO;
+using Microsoft.Extensions.Configuration;
 
 namespace TaxCalculator.Services.Services
 {
-    public class JarTarCalculator : ITaxCalculator
+    public class JarTarTaxCalculator : ITaxCalculator
     {
+
         IHttpClientFactory _clientFactory;
-        private string token = "Token token=\"5da2f821eee4035db4771edab942a4cc\"";
-        private string taxJarURL = "https://api.taxjar.com/v2/";
-        private string rateControllerURL = "rates/";
-        private string taxControllerURL = "taxes/";
-        public JarTarCalculator(IHttpClientFactory clientFactory)
+        private readonly IConfiguration _config;
+
+        public JarTarTaxCalculator(IHttpClientFactory clientFactory, IConfiguration config)
         {
+
+            _config = config;
+            var test = _config.GetValue<string>("AppIdentitySettings:API");
             this._clientFactory = clientFactory;
         }
 
@@ -38,9 +41,9 @@ namespace TaxCalculator.Services.Services
             optionalParameters += this.GetOptionalParameter(optionalParameters == String.Empty, "street", location.Street);
             optionalParameters += this.GetOptionalParameter(optionalParameters == String.Empty, "state", location.State);
 
-            var URL = this.taxJarURL + this.rateControllerURL + location.ZipCode + optionalParameters;
+            var URL = _config.GetValue<string>("AppIdentitySettings:API") + "rates/" + location.ZipCode + optionalParameters;
             var request = new HttpRequestMessage(HttpMethod.Get, URL);
-            request.Headers.Add("Authorization", token);
+            request.Headers.Add("Authorization", _config.GetValue<string>("AppIdentitySettings:Token"));
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
             var json = await response.Content.ReadAsStringAsync();
@@ -50,10 +53,10 @@ namespace TaxCalculator.Services.Services
 
         public decimal GetTaxesForOrder(Order order)
         {
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create(this.taxJarURL + this.taxControllerURL);
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(_config.GetValue<string>("AppIdentitySettings:API") + "taxes/");
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
-            httpWebRequest.Headers.Add("Authorization", "Token token=" + this.token);
+            httpWebRequest.Headers.Add("Authorization", "Token token=" + _config.GetValue<string>("AppIdentitySettings:Token"));
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {

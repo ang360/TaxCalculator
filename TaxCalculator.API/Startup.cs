@@ -24,11 +24,29 @@ namespace TaxCalculator.API
 
         public IConfiguration Configuration { get; }
 
+        public delegate ITaxCalculator ServiceResolver(string key);
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddTransient<ITaxCalculator,JarTarCalculator>();
+            services.AddTransient<JarTarTaxCalculator>();
+            services.AddTransient<MockTaxCalculator>();
+
+
+            services.AddTransient<ServiceResolver>(serviceProvider => key =>
+            {
+                switch (key)
+                {
+                    case "JarTar":
+                        return serviceProvider.GetService<JarTarTaxCalculator>();
+                    case "Mock":
+                        return serviceProvider.GetService<MockTaxCalculator>();
+                    default:
+                        throw new KeyNotFoundException();
+                }
+            });
+
             services.AddHttpClient();
             services.Configure<KestrelServerOptions>(options =>
             {
