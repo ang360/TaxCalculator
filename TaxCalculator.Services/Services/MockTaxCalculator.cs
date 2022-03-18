@@ -10,12 +10,12 @@ namespace TaxCalculator.Services.Services
     {
         public async Task<decimal> GetTaxRatesForLocation(Location location)
         {
-            return 0;
+            throw new NotImplementedException("This method is not implemented");
         }
 
-        public decimal GetTaxesForOrder(Order order)
+        public async Task<decimal> GetTaxesForOrder(Order order)
         {
-            return 0;
+            throw new NotImplementedException("This method is not implemented");
         }
     }
 }

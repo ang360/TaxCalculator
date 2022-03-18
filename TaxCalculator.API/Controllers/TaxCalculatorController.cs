@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using TaxCalculator.Models.Models;
@@ -13,13 +15,11 @@ namespace TaxCalculator.API.Controllers
     [ApiController]
     public class TaxCalculatorController : ControllerBase
     {
-        private ITaxCalculator _taxCalculator;
-        private readonly IConfiguration _config;
+        private ServiceResolver taxCalculator;
 
-        public TaxCalculatorController(ServiceResolver _taxCalculator, IConfiguration config)
+        public TaxCalculatorController(ServiceResolver taxCalculator)
         {
-            _config = config;
-            this._taxCalculator = _taxCalculator(_config.GetValue<string>("AppIdentitySettings:Client"));
+            this.taxCalculator = taxCalculator;
         }
 
         [Route("GetTaxRatesForLocation/{ZipCode}")]
@@ -28,25 +28,20 @@ namespace TaxCalculator.API.Controllers
         {
             var location = new Location
             {
+                ZipCode = ZipCode,
                 Country = Country,
                 State = State,
                 City = City,
                 Street = Street,
-                ZipCode = ZipCode
             };
-            return Ok(await this._taxCalculator.GetTaxRatesForLocation(location));
+            return Ok(await this.taxCalculator(Request.Headers["ClientID"]).GetTaxRatesForLocation(location));
         }
 
-        [Route("GetTaxesForOrder")]
         [HttpPost]
-        public IActionResult GetTaxesForOrder()
+        [Route("GetTaxesForOrder")]
+        public async Task<IActionResult> GetTaxesForOrder([FromBody]Order order)
         {
-            using (var reader = new StreamReader(Request.Body))
-            {
-                var body = reader.ReadToEnd();
-                Order order = JsonConvert.DeserializeObject<Order>(body);
-                return Ok(this._taxCalculator.GetTaxesForOrder(order));
-            }
+            return Ok(await this.taxCalculator(Request.Headers["ClientID"]).GetTaxesForOrder(order));
         }
     }
 }

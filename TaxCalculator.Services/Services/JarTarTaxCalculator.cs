@@ -20,9 +20,7 @@ namespace TaxCalculator.Services.Services
 
         public JarTarTaxCalculator(IHttpClientFactory clientFactory, IConfiguration config)
         {
-
             _config = config;
-            var test = _config.GetValue<string>("AppIdentitySettings:API");
             this._clientFactory = clientFactory;
         }
 
@@ -41,9 +39,9 @@ namespace TaxCalculator.Services.Services
             optionalParameters += this.GetOptionalParameter(optionalParameters == String.Empty, "street", location.Street);
             optionalParameters += this.GetOptionalParameter(optionalParameters == String.Empty, "state", location.State);
 
-            var URL = _config.GetValue<string>("AppIdentitySettings:API") + "rates/" + location.ZipCode + optionalParameters;
+            var URL = _config.GetValue<string>("ClientIdentity:JarTar:API") + "rates/" + location.ZipCode + optionalParameters;
             var request = new HttpRequestMessage(HttpMethod.Get, URL);
-            request.Headers.Add("Authorization", _config.GetValue<string>("AppIdentitySettings:Token"));
+            request.Headers.Add("Authorization", _config.GetValue<string>("ClientIdentity:JarTar:Token"));
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
             var json = await response.Content.ReadAsStringAsync();
@@ -51,12 +49,12 @@ namespace TaxCalculator.Services.Services
             return responseData.Rate.CombinedRate + responseData.Rate.StandardRate;
         }
 
-        public decimal GetTaxesForOrder(Order order)
+        public async Task<decimal> GetTaxesForOrder(Order order)
         {
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create(_config.GetValue<string>("AppIdentitySettings:API") + "taxes/");
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(_config.GetValue<string>("ClientIdentity:JarTar:API") + "taxes/");
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
-            httpWebRequest.Headers.Add("Authorization", "Token token=" + _config.GetValue<string>("AppIdentitySettings:Token"));
+            httpWebRequest.Headers.Add("Authorization", "Token token=" + _config.GetValue<string>("ClientIdentity:JarTar:Token"));
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
@@ -68,7 +66,7 @@ namespace TaxCalculator.Services.Services
             var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
             using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
             {
-                var result = streamReader.ReadToEnd();
+                var result = await streamReader.ReadToEndAsync();
                 var responseData = JsonConvert.DeserializeObject<JarTarTax>(result);
                 var test = responseData.Tax.AmountToCollect;
                 return test;

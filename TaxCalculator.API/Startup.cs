@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TaxCalculator.Extensions;
 using TaxCalculator.Services.Services;
 
 namespace TaxCalculator.API
@@ -33,7 +34,7 @@ namespace TaxCalculator.API
             services.AddTransient<JarTarTaxCalculator>();
             services.AddTransient<MockTaxCalculator>();
 
-
+            //Use a calculator service depending on the client
             services.AddTransient<ServiceResolver>(serviceProvider => key =>
             {
                 switch (key)
@@ -59,12 +60,15 @@ namespace TaxCalculator.API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            //Handling Errors Globally with the Built-in Middleware
+            app.CongifureExceptionHandler(logger);
 
             app.UseHttpsRedirection();
 

@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TaxCalculator.Extensions\TaxCalculator.Extensions.csproj" />
     <ProjectReference Include="..\TaxCalculator.Models\TaxCalculator.Models.csproj" />
     <ProjectReference Include="..\TaxCalculator.Services\TaxCalculator.Services.csproj" />
   </ItemGroup>
