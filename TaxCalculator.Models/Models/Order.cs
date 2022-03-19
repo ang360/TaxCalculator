@@ -62,7 +62,9 @@ namespace TaxCalculator.Models.Models
         public string Customer_Id { get; set; }
 
         [JsonProperty("line_items")]
-        public IEnumerable<LineItem> Line_Items { get; set; }
+        public List<LineItem> Line_Items { get; set; }
+        [JsonProperty("nexus_addresses")]
+        public List<NexusAddress> Nexus_Addresses { get; set; }
     }
 
     public class LineItem
@@ -90,5 +92,26 @@ namespace TaxCalculator.Models.Models
 
         [JsonProperty("sales_tax")]
         public decimal Sales_Tax { get; set; }
+    }
+
+    public class NexusAddress
+    {
+        [JsonProperty("id")]
+        public string Id { get; set; }
+
+        [JsonProperty("country")]
+        public string Country { get; set; }
+
+        [JsonProperty("zip")]
+        public string Zip { get; set; }
+
+        [JsonProperty("state")]
+        public string State { get; set; }
+
+        [JsonProperty("city")]
+        public string City { get; set; }
+
+        [JsonProperty("street")]
+        public string Street { get; set; }
     }
 }

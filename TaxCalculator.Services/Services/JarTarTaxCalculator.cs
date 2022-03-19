@@ -23,14 +23,22 @@ namespace TaxCalculator.Services.Services
             _config = config;
             this._clientFactory = clientFactory;
         }
+        
+        private string GetOptionalParameter(bool isEmpty, string field, string newParameter)
+        {
+            if (newParameter == null) return string.Empty;
+            if (isEmpty) return "?" + field + "=" + newParameter;
+            else return "&" + field + "=" + newParameter;
+        }
 
         public async Task<decimal> GetTaxRatesForLocation(Location location)
         {
             if (location.ZipCode == null) throw new ArgumentNullException();
-            string optionalParameters = "?Country=" + location.Country;
-            optionalParameters += "&City=" + location.City;
-            optionalParameters += "&Street=" + location.Street;
-            optionalParameters += "&State=" + location.State;
+            string optionalParameters = String.Empty;
+            optionalParameters += this.GetOptionalParameter(optionalParameters == String.Empty, "country", location.Country);
+            optionalParameters += this.GetOptionalParameter(optionalParameters == String.Empty, "city", location.City);
+            optionalParameters += this.GetOptionalParameter(optionalParameters == String.Empty, "street", location.Street);
+            optionalParameters += this.GetOptionalParameter(optionalParameters == String.Empty, "state", location.State);
 
             var baseURL = _config.GetValue<string>("ClientIdentity:JarTar:API");
             var URL = baseURL + "rates/" + location.ZipCode + optionalParameters;
@@ -40,6 +48,8 @@ namespace TaxCalculator.Services.Services
             var response = await client.SendAsync(request);
             var json = await response.Content.ReadAsStringAsync();
             var responseData = JsonConvert.DeserializeObject<JarTarRate>(json);
+            if (responseData == null || responseData.Rate == null)
+                return 0;
             return responseData.Rate.CombinedRate + responseData.Rate.StandardRate;
         }
 
@@ -64,8 +74,9 @@ namespace TaxCalculator.Services.Services
             {
                 var result = await streamReader.ReadToEndAsync();
                 var responseData = JsonConvert.DeserializeObject<JarTarTax>(result);
-                var test = responseData.Tax.AmountToCollect;
-                return test;
+                if (responseData == null || responseData.Tax == null)
+                    return 0;
+                return responseData.Tax.AmountToCollect;
             }
         }
     }

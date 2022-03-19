@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,13 @@ namespace TaxCalculator.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            //Register the Swagger generator
+            services.AddSwaggerGen(c =>
+            {
+                c.OperationFilter<AddRequiredHeaderParameter>();
+                c.SwaggerDoc(name: "v1", new OpenApiInfo { Title = "Tax Calculator API", Version = "v1"});
+            });
             services.AddTransient<JarTarTaxCalculator>();
             services.AddTransient<MockTaxCalculator>();
 
@@ -66,6 +74,16 @@ namespace TaxCalculator.API
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            //Enable middleware to serve generated Swagger as a JSON endpoint
+            app.UseSwagger();
+
+            //Enable middleware to serve swagger-ui (HTML, JS, CSS, etc. ),
+            //specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "Tax Calculator API V1");
+            });
 
             //Handling Errors Globally with the Built-in Middleware
             app.CongifureExceptionHandler(logger);
