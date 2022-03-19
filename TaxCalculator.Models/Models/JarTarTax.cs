@@ -5,6 +5,7 @@ using System.Text;
 
 namespace TaxCalculator.Models.Models
 {
+    //JarTar Tax Jason Response
     public class JarTarTax
     {
         [JsonProperty("tax")]

@@ -7,7 +7,7 @@ namespace TaxCalculator.Models.Models
 {
     public class Order
     {
-        //[JsonProperty("transaction_id")]
+        [JsonProperty("transaction_id")]
         public string Transaction_Id { get; set; }
 
         [JsonProperty("transaction_date")]
@@ -60,5 +60,35 @@ namespace TaxCalculator.Models.Models
 
         [JsonProperty("customer_id")]
         public string Customer_Id { get; set; }
+
+        [JsonProperty("line_items")]
+        public IEnumerable<LineItem> Line_Items { get; set; }
+    }
+
+    public class LineItem
+    {
+        [JsonProperty("id")]
+        public string Id { get; set; }
+
+        [JsonProperty("quantity")]
+        public int Quantity { get; set; }
+
+        [JsonProperty("product_identifier")]
+        public string Product_Identifier { get; set; }
+
+        [JsonProperty("description")]
+        public string Description { get; set; }
+
+        [JsonProperty("product_tax_code")]
+        public string Product_Tax_Code { get; set; }
+
+        [JsonProperty("unit_price")]
+        public decimal Unit_Price { get; set; }
+
+        [JsonProperty("discount")]
+        public decimal Discount { get; set; }
+
+        [JsonProperty("sales_tax")]
+        public decimal Sales_Tax { get; set; }
     }
 }

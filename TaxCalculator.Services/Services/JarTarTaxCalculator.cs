@@ -24,22 +24,16 @@ namespace TaxCalculator.Services.Services
             this._clientFactory = clientFactory;
         }
 
-        private string GetOptionalParameter(bool isEmpty, string field, string newParameter)
-        {
-            if (newParameter == null) return string.Empty;
-            if (isEmpty) return "?" + field + "=" + newParameter;
-            else return "&" + field + "=" + newParameter;
-        }
-
         public async Task<decimal> GetTaxRatesForLocation(Location location)
         {
-            string optionalParameters = String.Empty;
-            optionalParameters += this.GetOptionalParameter(optionalParameters == String.Empty, "country", location.Country);
-            optionalParameters += this.GetOptionalParameter(optionalParameters == String.Empty, "city", location.City);
-            optionalParameters += this.GetOptionalParameter(optionalParameters == String.Empty, "street", location.Street);
-            optionalParameters += this.GetOptionalParameter(optionalParameters == String.Empty, "state", location.State);
+            if (location.ZipCode == null) throw new ArgumentNullException();
+            string optionalParameters = "?Country=" + location.Country;
+            optionalParameters += "&City=" + location.City;
+            optionalParameters += "&Street=" + location.Street;
+            optionalParameters += "&State=" + location.State;
 
-            var URL = _config.GetValue<string>("ClientIdentity:JarTar:API") + "rates/" + location.ZipCode + optionalParameters;
+            var baseURL = _config.GetValue<string>("ClientIdentity:JarTar:API");
+            var URL = baseURL + "rates/" + location.ZipCode + optionalParameters;
             var request = new HttpRequestMessage(HttpMethod.Get, URL);
             request.Headers.Add("Authorization", _config.GetValue<string>("ClientIdentity:JarTar:Token"));
             var client = _clientFactory.CreateClient();
@@ -51,10 +45,12 @@ namespace TaxCalculator.Services.Services
 
         public async Task<decimal> GetTaxesForOrder(Order order)
         {
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create(_config.GetValue<string>("ClientIdentity:JarTar:API") + "taxes/");
+            if (order.To_Country == null) throw new ArgumentNullException();
+            var baseURL = _config.GetValue<string>("ClientIdentity:JarTar:API");
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(baseURL + "taxes/");
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";
-            httpWebRequest.Headers.Add("Authorization", "Token token=" + _config.GetValue<string>("ClientIdentity:JarTar:Token"));
+            httpWebRequest.Headers.Add("Authorization", _config.GetValue<string>("ClientIdentity:JarTar:Token"));
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {

@@ -5,6 +5,7 @@ using System.Text;
 
 namespace TaxCalculator.Models.Models
 {
+    //Model to handle errors with ExceptionMiddlewareExtensions
     public class ErrorDetails
     {
         public int StatusCode { get; set; }

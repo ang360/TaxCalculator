@@ -11,7 +11,7 @@ namespace TaxCalculator.Extensions
 
     public static class ExceptionMiddlewareExtensions
     {
-        //private static readonly ILogger<ExceptionMiddlewareExtensions> _logger;
+        //Global built-in error handling. Thrown errors can be added to the logger 
         public static void CongifureExceptionHandler(this IApplicationBuilder app, ILogger logger)
         {
             app.UseExceptionHandler(appError =>
