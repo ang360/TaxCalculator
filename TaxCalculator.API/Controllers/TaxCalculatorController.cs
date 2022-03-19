@@ -53,7 +53,14 @@ namespace TaxCalculator.API.Controllers
 
             //Get Tax Rates for a specific location using the specified Calculator service
             //The calculator service to be implemented depends on the client. The http request has a header "ClientID" with the ID of the client
-            return Ok(await this.taxCalculator(Request.Headers["ClientID"]).GetTaxRatesForLocation(location));
+            try
+            {
+                return Ok(await this.taxCalculator(Request.Headers["ClientID"]).GetTaxRatesForLocation(location));
+            }
+            catch (NotImplementedException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         //Get Taxes for a specific order
@@ -71,7 +78,14 @@ namespace TaxCalculator.API.Controllers
 
             //Get Taxes for a specific order using the specified Calculator service
             //The calculator service to be implemented depends on the client. The http request has a header "ClientID" with the ID of the client
-            return Ok(await this.taxCalculator(Request.Headers["ClientID"]).GetTaxesForOrder(order));
+            try
+            {
+                return Ok(await this.taxCalculator(Request.Headers["ClientID"]).GetTaxesForOrder(order));
+            }
+            catch (NotImplementedException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

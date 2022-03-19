@@ -21,7 +21,6 @@ namespace TaxCalculator.UnitTests
 
         private Mock<IHttpClientFactory> mockFactory;
         private IConfiguration configuration;
-        private TaxJarTaxCalculator taxJarTaxCalculator;
 
         // setup
         public TaxJarTaxCalculatorTest()
@@ -42,7 +41,6 @@ namespace TaxCalculator.UnitTests
             // Dispose here
             this.mockFactory = null;
             this.configuration = null;
-            this.taxJarTaxCalculator = null;
         }
 
         ///<name>

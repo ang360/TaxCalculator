@@ -18,12 +18,15 @@ namespace TaxCalculator.API
             if (operation.Parameters == null)
                 operation.Parameters = new List<OpenApiParameter>();
 
+            OpenApiSchema schema = new OpenApiSchema();
+            schema.Type = "string";
             //Add as many headers as you want
             operation.Parameters.Add(new OpenApiParameter()
             {
                 Name = "ClientID",
                 In = ParameterLocation.Header,
-                Required = true
+                Required = true,
+                Schema = schema
             });
         }
     }
