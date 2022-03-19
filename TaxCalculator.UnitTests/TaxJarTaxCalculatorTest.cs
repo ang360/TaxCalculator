@@ -16,20 +16,20 @@ using Xunit;
 
 namespace TaxCalculator.UnitTests
 {
-    public class JarTarTaxCalculatorTest : IDisposable
+    public class TaxJarTaxCalculatorTest : IDisposable
     {
 
         private Mock<IHttpClientFactory> mockFactory;
         private IConfiguration configuration;
-        private JarTarTaxCalculator jarTarTaxCalculator;
+        private TaxJarTaxCalculator taxJarTaxCalculator;
 
         // setup
-        public JarTarTaxCalculatorTest()
+        public TaxJarTaxCalculatorTest()
         {
             this.mockFactory = new Mock<IHttpClientFactory>();
             var inMemorySettings = new Dictionary<string, string> {
-                {"ClientIdentity:JarTar:API", "https://api.taxjar.com/v2/"},
-                {"ClientIdentity:JarTar:Token", "Token token=\"5da2f821eee4035db4771edab942a4cc\""},
+                {"ClientIdentity:TaxJar:API", "https://api.taxjar.com/v2/"},
+                {"ClientIdentity:TaxJar:Token", "Token token=\"5da2f821eee4035db4771edab942a4cc\""},
             };
             this.configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(inMemorySettings)
@@ -42,7 +42,7 @@ namespace TaxCalculator.UnitTests
             // Dispose here
             this.mockFactory = null;
             this.configuration = null;
-            this.jarTarTaxCalculator = null;
+            this.taxJarTaxCalculator = null;
         }
 
         ///<name>
@@ -67,7 +67,7 @@ namespace TaxCalculator.UnitTests
             var client = new HttpClient(mockHttpMessageHandler.Object);
             mockFactory.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(client);
 
-            JarTarTaxCalculator jarTarTaxCalculator = new JarTarTaxCalculator(mockFactory.Object, configuration);
+            TaxJarTaxCalculator taxJarTaxCalculator = new TaxJarTaxCalculator(mockFactory.Object, configuration);
 
             var location = new Location
             {
@@ -80,7 +80,7 @@ namespace TaxCalculator.UnitTests
             var expected = 0.1025;
             
             //Act
-            var actual = await jarTarTaxCalculator.GetTaxRatesForLocation(location);
+            var actual = await taxJarTaxCalculator.GetTaxRatesForLocation(location);
 
             //Assert
             Assert.Equal(expected.ToString(), actual.ToString());
@@ -96,7 +96,7 @@ namespace TaxCalculator.UnitTests
         public async Task GetTaxRatesForLocation_RainyTest_01()
         {
             //Arrange
-            JarTarTaxCalculator jarTarTaxCalculator = new JarTarTaxCalculator(mockFactory.Object, configuration);
+            TaxJarTaxCalculator taxJarTaxCalculator = new TaxJarTaxCalculator(mockFactory.Object, configuration);
 
             var location = new Location
             {
@@ -106,13 +106,13 @@ namespace TaxCalculator.UnitTests
                 City = "Santa Monica",
                 Street = "",
             };
-            var expected = "Value cannot be null.";
+            var expected = "Zip Code is a required field";
 
             //Act
-            var actual = Assert.ThrowsAsync<ArgumentNullException>(() => jarTarTaxCalculator.GetTaxRatesForLocation(location));
+            var actual = await Assert.ThrowsAsync<ArgumentNullException>(() => taxJarTaxCalculator.GetTaxRatesForLocation(location));
 
             //Assert
-            Assert.Equal(expected, actual.Result.Message);
+            Assert.Equal(expected, actual.ParamName);
         }
 
         ///<name>
@@ -125,7 +125,7 @@ namespace TaxCalculator.UnitTests
         public async Task GetTaxesForOrder_SunnyTest_01()
         {
             //Arrange
-            JarTarTaxCalculator jarTarTaxCalculator = new JarTarTaxCalculator(mockFactory.Object, configuration);
+            TaxJarTaxCalculator taxJarTaxCalculator = new TaxJarTaxCalculator(mockFactory.Object, configuration);
             var lineItem = new LineItem
             {
                 Quantity = 1,
@@ -149,7 +149,7 @@ namespace TaxCalculator.UnitTests
             var expected = 1.09;
 
             //Act
-            var actual = await jarTarTaxCalculator.GetTaxesForOrder(order);
+            var actual = await taxJarTaxCalculator.GetTaxesForOrder(order);
 
             //Assert
             Assert.Equal(expected.ToString(), actual.ToString());
@@ -165,7 +165,7 @@ namespace TaxCalculator.UnitTests
         public async Task GetTaxesForOrder_RainyTest_01()
         {
             //Arrange
-            JarTarTaxCalculator jarTarTaxCalculator = new JarTarTaxCalculator(mockFactory.Object, configuration);
+            TaxJarTaxCalculator taxJarTaxCalculator = new TaxJarTaxCalculator(mockFactory.Object, configuration);
             var lineItem = new LineItem
             {
                 Quantity = 1,
@@ -186,13 +186,13 @@ namespace TaxCalculator.UnitTests
                 Shipping = 1.5M,
                 Line_Items = lineItemList
             };
-            var expected = "Value cannot be null.";
+            var expected = "To Country is a required field";
 
             //Act
-            var actual = Assert.ThrowsAsync<ArgumentNullException>(() => jarTarTaxCalculator.GetTaxesForOrder(order));
+            var actual = await Assert.ThrowsAsync<ArgumentNullException>(() => taxJarTaxCalculator.GetTaxesForOrder(order));
 
             //Assert
-            Assert.Equal(expected, actual.Result.Message);
+            Assert.Equal(expected, actual.ParamName);
         }
     }
 }

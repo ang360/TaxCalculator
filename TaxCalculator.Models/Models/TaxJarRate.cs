@@ -5,14 +5,14 @@ using System.Text;
 
 namespace TaxCalculator.Models.Models
 {
-    //JarTar Rate Jason Response
-    public class JarTarRate
+    //TaxJar Rate JSON Response
+    public class TaxJarRate
     {
         [JsonProperty("rate")]
-        public JarTarRateAttributes Rate { get; set; }
+        public TaxJarRateAttributes Rate { get; set; }
     }
 
-    public class JarTarRateAttributes
+    public class TaxJarRateAttributes
     {
         [JsonProperty("combined_rate")]
         public decimal CombinedRate { get; set; }

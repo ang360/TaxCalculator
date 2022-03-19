@@ -11,7 +11,8 @@ namespace TaxCalculator.Extensions
 
     public static class ExceptionMiddlewareExtensions
     {
-        //Global built-in error handling. Thrown errors can be added to the logger 
+        //Global built-in error handling
+        //All errors are catched here. We save the actual error to our logger and return a generic error
         public static void CongifureExceptionHandler(this IApplicationBuilder app, ILogger logger)
         {
             app.UseExceptionHandler(appError =>
@@ -24,7 +25,9 @@ namespace TaxCalculator.Extensions
                     var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
                     if (contextFeature != null)
                     {
+                        //Log error
                         logger.LogError($"Something went wrong: {contextFeature.Error}");
+                        //Display Error JSON to the client
                         await context.Response.WriteAsync(new ErrorDetails
                         {
                             StatusCode = context.Response.StatusCode,

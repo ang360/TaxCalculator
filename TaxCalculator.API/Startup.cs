@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TaxCalculator.Extensions;
+using TaxCalculator.Loggers;
 using TaxCalculator.Services.Services;
 
 namespace TaxCalculator.API
@@ -39,16 +40,18 @@ namespace TaxCalculator.API
                 c.OperationFilter<AddRequiredHeaderParameter>();
                 c.SwaggerDoc(name: "v1", new OpenApiInfo { Title = "Tax Calculator API", Version = "v1"});
             });
-            services.AddTransient<JarTarTaxCalculator>();
+            services.AddTransient<TaxJarTaxCalculator>();
             services.AddTransient<MockTaxCalculator>();
+
+            services.AddSingleton<ITaxCalculatorLogger, TaxCalculatorLogger>();
 
             //Use a calculator service depending on the client
             services.AddTransient<ServiceResolver>(serviceProvider => key =>
             {
                 switch (key)
                 {
-                    case "JarTar":
-                        return serviceProvider.GetService<JarTarTaxCalculator>();
+                    case "TaxJar":
+                        return serviceProvider.GetService<TaxJarTaxCalculator>();
                     case "Mock":
                         return serviceProvider.GetService<MockTaxCalculator>();
                     default:

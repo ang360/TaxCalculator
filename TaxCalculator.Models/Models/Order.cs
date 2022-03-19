@@ -62,9 +62,9 @@ namespace TaxCalculator.Models.Models
         public string Customer_Id { get; set; }
 
         [JsonProperty("line_items")]
-        public List<LineItem> Line_Items { get; set; }
+        public IEnumerable<LineItem> Line_Items { get; set; }
         [JsonProperty("nexus_addresses")]
-        public List<NexusAddress> Nexus_Addresses { get; set; }
+        public IEnumerable<NexusAddress> Nexus_Addresses { get; set; }
     }
 
     public class LineItem

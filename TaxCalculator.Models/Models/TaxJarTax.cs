@@ -5,14 +5,14 @@ using System.Text;
 
 namespace TaxCalculator.Models.Models
 {
-    //JarTar Tax Jason Response
-    public class JarTarTax
+    //TaxJar Tax JSON Response
+    public class TaxJarTax
     {
         [JsonProperty("tax")]
-        public JarTarTaxAttributes Tax { get; set; }
+        public TaxJarTaxAttributes Tax { get; set; }
     }
 
-    public class JarTarTaxAttributes
+    public class TaxJarTaxAttributes
     {
         [JsonProperty("amount_to_collect")]
         public decimal AmountToCollect { get; set; }

@@ -18,6 +18,8 @@ namespace TaxCalculator.API
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                //Configure Logging - Loggin is only configured for the Debugger. More options can be added
+                //Options: Logging, Console, EventSource, EventLog, AzureAppServicesFile, AzureAppServicesBlob, ApplicationInsights
                 .ConfigureLogging((context, logging) =>
                 {
                     logging.ClearProviders();
